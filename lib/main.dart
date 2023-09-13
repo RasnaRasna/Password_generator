@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:password_generator/onboarding.dart';
 
 import 'homepage.dart';
 
@@ -13,12 +14,15 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color.fromARGB(255, 58, 18, 6),
+        ),
         useMaterial3: true,
       ),
-      home: const MyHomePage(),
+      home: const OnboardingScreen(),
     );
   }
 }
