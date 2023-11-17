@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "903032078363",
+    "project_id": "password-generator-cf5dd",
+    "storage_bucket": "password-generator-cf5dd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:903032078363:android:e60e8a80a053129360f8be",
+        "android_client_info": {
+          "package_name": "com.example.password_generator"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAU9t_PUnmB7ZJ6Sf-HBAWQSEx7ZRmFQFA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

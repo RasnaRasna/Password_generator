@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:password_generator/onboarding.dart';
+import 'package:password_generator/const/const.dart';
+import 'package:firebase_core/firebase_core.dart'; // Import the Firebase Core package
 
 import 'homepage.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Required for FlutterFire
+
+  // Initialize Firebase
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -18,11 +23,13 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Color.fromARGB(255, 58, 18, 6),
+          seedColor: GreenColor,
         ),
         useMaterial3: true,
       ),
-      home: const OnboardingScreen(),
+      home: const MyHomePage(
+        password: '',
+      ),
     );
   }
 }
