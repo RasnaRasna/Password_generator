@@ -23,6 +23,8 @@ class _PasswordGeneratingState extends State<PasswordGenerating> {
   bool isCheckedSpecialCharacters = false;
   double selectedNumber = 0;
   String generatedPassword = '';
+  String previousGeneratedPassword = ''; // Add this variable
+
   String lengthError = '';
   bool isFavorite = false;
   TextEditingController accountNameController = TextEditingController();
@@ -161,30 +163,14 @@ class _PasswordGeneratingState extends State<PasswordGenerating> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 InkWell(
-                                  onTap: () {
-                                    FavouritePasswortoFirestore(
-                                        generatedPassword);
+                                  onTap: () async {
+                                    bool isPasswordInFavorites =
+                                        await FavouritePasswortoFirestore(
+                                            generatedPassword);
+
+                                    // Update the isFavorite state based on whether the password is in favorites
                                     setState(() {
-                                      isFavorite = !isFavorite;
-                                      if (isFavorite) {
-                                        // Add your logic for adding to favorites here
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                            backgroundColor: Colors.grey,
-                                            content: Text('Added to favorites',
-                                                style: TextStyle(
-                                                    color: Colors.white)),
-                                            duration: Duration(seconds: 3),
-                                            behavior: SnackBarBehavior.floating,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            elevation: 5,
-                                          ),
-                                        );
-                                      }
+                                      isFavorite = isPasswordInFavorites;
                                     });
                                   },
                                   child: Icon(
@@ -274,22 +260,70 @@ class _PasswordGeneratingState extends State<PasswordGenerating> {
     );
   }
 
-  Future<void> FavouritePasswortoFirestore(String password) async {
+  Future<bool> FavouritePasswortoFirestore(String password) async {
     try {
-      FirebaseFirestore.instance.collection("favouritePassword").add({
-        'password': password,
-        'timestamp': FieldValue.serverTimestamp(),
-      });
-      print("favourite:${password}");
+      // Check if the password already exists in favorites
+      var existingFavorites = await FirebaseFirestore.instance
+          .collection("favouritePassword")
+          .where('password', isEqualTo: password)
+          .get();
+
+      if (existingFavorites.docs.isEmpty) {
+        // Password does not exist in favorites, add it
+        FirebaseFirestore.instance.collection("favouritePassword").add({
+          'password': password,
+          'timestamp': FieldValue.serverTimestamp(),
+        });
+
+        print("Added to favorites: $password");
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.grey,
+            content: Text('Added to favorites',
+                style: TextStyle(color: Colors.white)),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            elevation: 5,
+          ),
+        );
+
+        // Return true to indicate that the password is in favorites
+        return true;
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.grey,
+            content: Text('Password already in favorites',
+                style: TextStyle(color: Colors.white)),
+            duration: Duration(seconds: 2),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            elevation: 5,
+          ),
+        );
+        print("Password already in favorites");
+
+        // Return false to indicate that the password is not in favorites
+        return false;
+      }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           backgroundColor: Colors.red,
           content: Text('Error saving password'),
           duration: Duration(seconds: 3),
         ),
       );
       print('Error saving password: $e');
+
+      // Return false in case of an error
+      return false;
     }
   }
 

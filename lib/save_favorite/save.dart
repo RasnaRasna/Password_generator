@@ -3,6 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:password_generator/buttons/copy_button.dart';
 import 'package:password_generator/const/const.dart';
 import 'package:intl/intl.dart';
+import 'package:password_generator/homepage.dart';
+
+import '../buttons/favourite_buttons.dart';
 
 class SavedPassword extends StatefulWidget {
   final String password;
@@ -14,7 +17,7 @@ class SavedPassword extends StatefulWidget {
 }
 
 class _SavedPasswordState extends State<SavedPassword> {
-  bool isFavorite = false;
+  List<bool> isFavoriteList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -128,6 +131,11 @@ class _SavedPasswordState extends State<SavedPassword> {
               ),
             );
           }
+          // Initialize isFavoriteList if it's empty or not the same length as documents
+          if (isFavoriteList.isEmpty ||
+              isFavoriteList.length != documents.length) {
+            isFavoriteList = List.generate(documents.length, (index) => false);
+          }
 
           return ListView.separated(
             separatorBuilder: (context, index) => SizedBox(height: 10),
@@ -151,31 +159,25 @@ class _SavedPasswordState extends State<SavedPassword> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         InkWell(
-                          onTap: () {
-                            print(widget.password);
-                            // FavouritePasswortoFirestore(widget.password);
+                          onTap: () async {
+                            FavouritePasswortoFirestore(
+                                passwordController.text);
+                            // Toggle the favorite status for the specific password
                             setState(() {
-                              isFavorite = !isFavorite;
-                              if (isFavorite) {
-                                // Add your logic for adding to favorites here
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    backgroundColor: Colors.grey,
-                                    content: Text('Added to favorites',
-                                        style: TextStyle(color: Colors.white)),
-                                    duration: Duration(seconds: 3),
-                                    behavior: SnackBarBehavior.floating,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    elevation: 5,
-                                  ),
-                                );
-                              }
+                              isFavoriteList[index] = !isFavoriteList[index];
                             });
+                            await toggleFavoriteStatus(
+                              documents[index].id,
+                              isFavoriteList[index],
+                            );
                           },
                           child: Icon(
-                            isFavorite ? Icons.favorite : Icons.favorite_border,
+                            isFavoriteList[index]
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: isFavoriteList[index]
+                                ? Colors.red
+                                : Colors.black,
                           ),
                         ),
                         CopyButton(),
@@ -204,6 +206,28 @@ class _SavedPasswordState extends State<SavedPassword> {
     // Format the time as per your requirement
     String formattedTime = DateFormat.jm().format(time);
     return formattedTime; // ${time.day}/${time.month}/${time.year}";
+  }
+
+  void removeFromFavorites(String documentId) {
+    FirebaseFirestore.instance
+        .collection('favouritePassword')
+        .doc(documentId) // Use the document ID
+        .delete();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.grey,
+        content: Text('Removed from favorites',
+            style: TextStyle(color: Colors.white)),
+        duration: Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        elevation: 5,
+      ),
+    );
+
+    // Optionally, you can show a SnackBar or perform any other actions after removal.
   }
 
   Future<void> FavouritePasswortoFirestore(String password) async {

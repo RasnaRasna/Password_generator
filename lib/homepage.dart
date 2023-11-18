@@ -99,7 +99,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       InkWell(
                         onTap: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (ctx) => const FavoritePassword()));
+                              builder: (ctx) => FavoritePassword()));
                         },
                         child: Container(
                           decoration: BoxDecoration(
