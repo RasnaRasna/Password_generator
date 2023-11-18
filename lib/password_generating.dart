@@ -181,7 +181,7 @@ class _PasswordGeneratingState extends State<PasswordGenerating> {
                                         isFavorite ? Colors.red : Colors.black,
                                   ),
                                 ),
-                                CopyButton()
+                                const CopyButton()
                               ],
                             ),
                           ))),
@@ -206,7 +206,7 @@ class _PasswordGeneratingState extends State<PasswordGenerating> {
                                     onPressed: () {
                                       Navigator.pop(context);
                                     },
-                                    child: Text("Cancel"),
+                                    child: const Text("Cancel"),
                                   ),
                                   TextButton(
                                     onPressed: () {
@@ -219,7 +219,7 @@ class _PasswordGeneratingState extends State<PasswordGenerating> {
                                                     password: generatedPassword,
                                                   )));
                                     },
-                                    child: Text("Save"),
+                                    child: const Text("Save"),
                                   )
                                 ],
                               ),
@@ -228,14 +228,19 @@ class _PasswordGeneratingState extends State<PasswordGenerating> {
                           content: TextField(
                             controller: accountNameController,
                           ),
-                          title: Text(
-                            'Enter Password Account Name',
+                          title: const Text(
+                            'Enter the name to Save your password',
                             style: textStyleblack,
                           ),
                         ));
                 // Pass the generated password data to the SavedPassword screen
               },
               child: Container(
+                height: 90,
+                width: 130,
+                decoration: BoxDecoration(
+                    border: Border.all(color: GreenColor),
+                    borderRadius: BorderRadius.circular(10)),
                 child: const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Column(children: [
@@ -243,16 +248,11 @@ class _PasswordGeneratingState extends State<PasswordGenerating> {
                       Icons.save,
                       color: GreenColor,
                     ),
-                    Text("   Saved\nPassword",
+                    Text(" Save this\nPassword",
                         style: TextStyle(
                             color: GreenColor, fontWeight: FontWeight.bold)),
                   ]),
                 ),
-                height: 90,
-                width: 130,
-                decoration: BoxDecoration(
-                    border: Border.all(color: GreenColor),
-                    borderRadius: BorderRadius.circular(10)),
               ),
             ),
           )
@@ -280,9 +280,9 @@ class _PasswordGeneratingState extends State<PasswordGenerating> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: Colors.grey,
-            content: Text('Added to favorites',
+            content: const Text('Added to favorites',
                 style: TextStyle(color: Colors.white)),
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -297,9 +297,9 @@ class _PasswordGeneratingState extends State<PasswordGenerating> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: Colors.grey,
-            content: Text('Password already in favorites',
+            content: const Text('Password already in favorites',
                 style: TextStyle(color: Colors.white)),
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -314,7 +314,7 @@ class _PasswordGeneratingState extends State<PasswordGenerating> {
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           backgroundColor: Colors.red,
           content: Text('Error saving password'),
           duration: Duration(seconds: 3),

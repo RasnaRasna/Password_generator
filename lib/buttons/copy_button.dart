@@ -12,10 +12,15 @@ class CopyButton extends StatelessWidget {
         onTap: () {
           Clipboard.setData(ClipboardData(text: passwordController.text));
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              backgroundColor: Colors.green,
+            SnackBar(
+              backgroundColor: Colors.grey,
               content: Text('Password copied to clipboard'),
               duration: Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              elevation: 5,
             ),
           );
         },

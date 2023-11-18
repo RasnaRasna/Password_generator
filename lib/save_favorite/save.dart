@@ -153,45 +153,23 @@ class _SavedPasswordState extends State<SavedPassword> {
                   border: Border.all(color: Colors.black12),
                 ),
                 child: ListTile(
-                  trailing: SizedBox(
-                    width: 60, // Set a specific width for the SizedBox
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        InkWell(
-                          onTap: () async {
-                            FavouritePasswortoFirestore(
-                                passwordController.text);
-                            // Toggle the favorite status for the specific password
-                            setState(() {
-                              isFavoriteList[index] = !isFavoriteList[index];
-                            });
-                            await toggleFavoriteStatus(
-                              documents[index].id,
-                              isFavoriteList[index],
-                            );
-                          },
-                          child: Icon(
-                            isFavoriteList[index]
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            color: isFavoriteList[index]
-                                ? Colors.red
-                                : Colors.black,
-                          ),
-                        ),
-                        CopyButton(),
-                      ],
-                    ),
+                  trailing: CopyButton(),
+                  subtitle: Text(
+                    savedPassword["accountName"] ?? "",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold, color: GreenColor),
                   ),
-                  subtitle: Text(savedPassword["accountName"] ?? ""),
                   title: Text(
                     savedPassword['password'],
                     style: TextStyle(
                         color: GreenColor, fontWeight: FontWeight.bold),
                   ),
                   leading: Text(
-                    _formatTime(timestamp),
+                    _formatDate(timestamp),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        color: GreenColor),
                   ),
                 ),
               );
@@ -202,57 +180,9 @@ class _SavedPasswordState extends State<SavedPassword> {
     );
   }
 
-  String _formatTime(DateTime time) {
-    // Format the time as per your requirement
-    String formattedTime = DateFormat.jm().format(time);
-    return formattedTime; // ${time.day}/${time.month}/${time.year}";
-  }
-
-  void removeFromFavorites(String documentId) {
-    FirebaseFirestore.instance
-        .collection('favouritePassword')
-        .doc(documentId) // Use the document ID
-        .delete();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor: Colors.grey,
-        content: Text('Removed from favorites',
-            style: TextStyle(color: Colors.white)),
-        duration: Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        elevation: 5,
-      ),
-    );
-
-    // Optionally, you can show a SnackBar or perform any other actions after removal.
-  }
-
-  Future<void> FavouritePasswortoFirestore(String password) async {
-    try {
-      FirebaseFirestore.instance.collection("favouritePassword").add({
-        'password': password,
-        'timestamp': FieldValue.serverTimestamp(),
-      });
-      // Show a success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.green,
-          content: Text('Password saved successfully'),
-          duration: Duration(seconds: 3),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: Colors.red,
-          content: Text('Error saving password'),
-          duration: Duration(seconds: 3),
-        ),
-      );
-      print('Error saving password: $e');
-    }
+  String _formatDate(DateTime time) {
+    // Format the time as a date (e.g., 2023-11-18)
+    String formattedDate = DateFormat('dd-MM-yyyy').format(time);
+    return formattedDate;
   }
 }

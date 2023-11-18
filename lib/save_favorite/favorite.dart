@@ -86,6 +86,13 @@ class _FavoritePasswordState extends State<FavoritePassword> {
                   border: Border.all(color: Colors.black12),
                 ),
                 child: ListTile(
+                  leading: Text(
+                    _formatDate(timestamp),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        color: GreenColor),
+                  ),
                   trailing: SizedBox(
                     width: 60, // Set a specific width for the SizedBox
                     child: Row(
@@ -215,6 +222,12 @@ class _FavoritePasswordState extends State<FavoritePassword> {
         }
       },
     );
+  }
+
+  String _formatDate(DateTime time) {
+    // Format the time as a date (e.g., 2023-11-18)
+    String formattedDate = DateFormat('dd-MM-yyyy').format(time);
+    return formattedDate;
   }
 
   String _formatTime(DateTime time) {
