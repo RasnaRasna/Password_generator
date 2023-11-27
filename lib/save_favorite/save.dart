@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:password_generator/buttons/copy_button.dart';
 import 'package:password_generator/const/const.dart';
 import 'package:intl/intl.dart';
@@ -39,75 +40,10 @@ class _SavedPasswordState extends State<SavedPassword> {
         ),
         actions: [
           IconButton(
-            onPressed: () async {
-              // Get a reference to the 'savedPasswords' collection
-              CollectionReference savedPasswordsCollection =
-                  FirebaseFirestore.instance.collection("savedPasswords");
-
-              // Get all documents in the 'savedPasswords' collection
-              QuerySnapshot snapshot = await savedPasswordsCollection.get();
-
-              if (snapshot.docs.isEmpty) {
-                // Show a dialog informing the user that there are no passwords to delete
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    content: Text(
-                      "There are no passwords to delete.",
-                      style: textStyleblack,
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text("OK"),
-                      ),
-                    ],
-                  ),
-                );
-              } else {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: Text(
-                      "Are you want to delete all Password ?",
-                      style: textStyleblack,
-                    ),
-                    actions: [
-                      SizedBox(
-                        width: 130,
-                        child: Row(
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              child: Text("No"),
-                            ),
-                            TextButton(
-                              onPressed: () async {
-                                // Loop through each document and delete it
-                                for (QueryDocumentSnapshot doc
-                                    in snapshot.docs) {
-                                  await doc.reference.delete();
-                                }
-
-                                // Close the dialog
-                                Navigator.pop(context);
-                              },
-                              child: Text("Yes"),
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                );
-              }
-            },
-            icon: Icon(Icons.delete),
-          )
+              onPressed: () {
+                deleteAllSavedPasswords(context);
+              },
+              icon: Icon(Icons.delete))
         ],
       ),
       body: StreamBuilder(
@@ -147,29 +83,68 @@ class _SavedPasswordState extends State<SavedPassword> {
               DateTime timestamp = savedPassword['timestamp'] != null
                   ? savedPassword['timestamp'].toDate()
                   : DateTime.now();
-              return Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.black12),
-                ),
-                child: ListTile(
-                  trailing: CopyButton(),
-                  subtitle: Text(
-                    savedPassword["accountName"] ?? "",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold, color: GreenColor),
+              return Slidable(
+                endActionPane: ActionPane(motion: ScrollMotion(), children: [
+                  SlidableAction(
+                    onPressed: (context) {
+                      showDialog(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                                title: const Text(
+                                  'alert',
+                                  style: TextStyle(
+                                      fontSize: 15, color: Colors.red),
+                                ),
+                                content: const Text('Do you want to delete '),
+                                actions: [
+                                  Row(
+                                    children: [
+                                      TextButton(
+                                          onPressed: () {
+                                            deleteSavedPassword(
+                                                documents[index].id);
+                                            Navigator.of(ctx).pop();
+                                          },
+                                          child: const Text('Yes')),
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.of(ctx).pop();
+                                          },
+                                          child: const Text('No'))
+                                    ],
+                                  ),
+                                ],
+                              ));
+                    },
+                    backgroundColor: GreenColor,
+                    icon: Icons.delete,
+                    foregroundColor: Colors.red,
                   ),
-                  title: Text(
-                    savedPassword['password'],
-                    style: TextStyle(
-                        color: GreenColor, fontWeight: FontWeight.bold),
+                ]),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.black12),
                   ),
-                  leading: Text(
-                    _formatDate(timestamp),
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                        color: GreenColor),
+                  child: ListTile(
+                    trailing: CopyButton(),
+                    subtitle: Text(
+                      savedPassword["accountName"] ?? "",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: GreenColor),
+                    ),
+                    title: Text(
+                      savedPassword['password'],
+                      style: TextStyle(
+                          color: GreenColor, fontWeight: FontWeight.bold),
+                    ),
+                    leading: Text(
+                      _formatDate(timestamp),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13,
+                          color: GreenColor),
+                    ),
                   ),
                 ),
               );
@@ -177,6 +152,74 @@ class _SavedPasswordState extends State<SavedPassword> {
           );
         },
       ),
+    );
+  }
+
+  void deleteSavedPassword(String DocumentId) {
+    FirebaseFirestore.instance
+        .collection("savedPasswords")
+        .doc(DocumentId)
+        .delete();
+  }
+
+  void deleteAllSavedPasswords(BuildContext context) {
+    FirebaseFirestore.instance.collection('savedPasswords').get().then(
+      (snapshot) {
+        if (snapshot.docs.isEmpty) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text(""),
+              content: Text(
+                "There are no passwords to delete.",
+                style: textStyleblack,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("OK"),
+                ),
+              ],
+            ),
+          );
+        } else {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text("Delete All Passwords?"),
+              content: null,
+              actions: [
+                SizedBox(
+                  width: 130,
+                  child: Row(
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text("No"),
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          // Delete all passwords
+                          for (DocumentSnapshot doc in snapshot.docs) {
+                            doc.reference.delete();
+                          }
+                          // Close the dialog
+                          Navigator.pop(context);
+                        },
+                        child: Text("Yes"),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+      },
     );
   }
 
