@@ -363,6 +363,8 @@ class _PasswordGeneratingState extends State<PasswordGenerating> {
       setState(() {
         lengthError = 'Password length should be at least 4';
         generatedPassword = '';
+        isFavorite =
+            false; // Reset isFavorite to false when generating a new password
       });
 
       // Show the length error message

@@ -29,7 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           centerTitle: true,
           title: const Text(
-            "Password Generator",
+            "Secure Passwords",
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
         ),

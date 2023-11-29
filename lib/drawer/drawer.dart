@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:password_generator/const/const.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Settings extends StatelessWidget {
   const Settings({super.key});
@@ -13,6 +14,12 @@ class Settings extends StatelessWidget {
             height: 30,
           ),
           Container(
+            child: Center(
+              child: Text(
+                "Secure Passwords",
+                style: textStylee,
+              ),
+            ),
             decoration: BoxDecoration(
                 color: Color.fromARGB(255, 19, 72, 58),
                 borderRadius: BorderRadius.circular(20)),
@@ -41,7 +48,24 @@ class Settings extends StatelessWidget {
               "About",
               style: textStyleblack,
             ),
-            onTap: () {},
+            onTap: () {
+              showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                        content: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Text(
+                            "  Developed by Rasna",
+                            style: textStyleblack,
+                          ),
+                        ),
+                        title: const Text(
+                          'Secure Passwords',
+                          style: TextStyle(
+                              fontSize: 25, fontWeight: FontWeight.bold),
+                        ),
+                      ));
+            },
           ),
           ListTile(
             leading: const Icon(Icons.privacy_tip),
@@ -49,10 +73,22 @@ class Settings extends StatelessWidget {
               "Privacy pilicy",
               style: textStyleblack,
             ),
-            onTap: () {},
+            onTap: () {
+              _launchPrivacyPolicyURL();
+            },
           )
         ],
       ),
     );
+  }
+
+  _launchPrivacyPolicyURL() async {
+    const url =
+        'https://docs.google.com/document/d/1ubbnOiFpEWbhGPq84o7ooqRUEWfInXA6jNlCulKaE-8/edit';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }
